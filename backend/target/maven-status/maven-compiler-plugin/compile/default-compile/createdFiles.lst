@@ -1,0 +1,4 @@
+com\securaccess\enterprise\entities\Utilisateur$TypeUtilisateur.class
+com\securaccess\enterprise\entities\Utilisateur.class
+com\securaccess\enterprise\resources\TestResource.class
+com\securaccess\enterprise\resources\ApplicationConfig.class
