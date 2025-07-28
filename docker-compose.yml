@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  database:
+    image: mysql:8.0
+    container_name: securaccess-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: securaccess_db
+      MYSQL_USER: root
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - securaccess-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  # Backend - Java EE with WildFly
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: securaccess-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - securaccess-network
+    environment:
+      - DB_HOST=database
+      - DB_PORT=3306
+      - DB_NAME=securaccess_db
+      - DB_USER=root
+      - DB_PASSWORD=""
+
+  # Frontend - Vue.js with Vite
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: securaccess-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - securaccess-network
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080/securaccess-enterprise/api
+
+volumes:
+  mysql_data:
+
+networks:
+  securaccess-network:
+    driver: bridge

@@ -1,0 +1,9 @@
+src/
+.git/
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+target/classes/
+target/maven-*/
+target/*-reports/
