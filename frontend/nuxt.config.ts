@@ -1,14 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: false },
+  ssr: true,
   modules: [
-    '@nuxtjs/tailwindcss',
-    '@nuxtjs/color-mode'
+    '@nuxtjs/tailwindcss'
   ],
   css: ['~/assets/css/main.css'],
-  colorMode: {
-    classSuffix: ''
-  },
   runtimeConfig: {
     public: {
       apiBase: process.env.API_BASE_URL || 'http://localhost:8080/securaccess-enterprise/api'
