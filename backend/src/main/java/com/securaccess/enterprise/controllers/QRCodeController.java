@@ -9,6 +9,17 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import javax.imageio.ImageIO;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 @RestController
 @RequestMapping("/qrcode")
@@ -253,13 +264,22 @@ public class QRCodeController {
     
     @GetMapping("/{qrCodeId}/image")
     public ResponseEntity<byte[]> getQRCodeImage(@PathVariable String qrCodeId) {
-        // Mock QR code image generation
-        // In a real implementation, you would use a QR code library like ZXing
-        byte[] mockImage = generateMockQRCodeImage(qrCodeId);
-        
-        return ResponseEntity.ok()
-            .contentType(MediaType.IMAGE_PNG)
-            .body(mockImage);
+        try {
+            // Generate QR code content with the access URL
+            String qrContent = "http://ec2-13-49-68-126.eu-north-1.compute.amazonaws.com/qr/" + qrCodeId;
+            
+            // Generate real QR code image
+            byte[] qrCodeImage = generateQRCodeImage(qrContent, 300, 300);
+            
+            return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(qrCodeImage);
+                
+        } catch (Exception e) {
+            // Return error response if QR generation fails
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new byte[0]);
+        }
     }
     
     // Helper methods
@@ -270,13 +290,41 @@ public class QRCodeController {
     }
     
     private String generateQRCodeUrl(String qrCodeId) {
-        // In a real implementation, this would generate an actual QR code
-        return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+        try {
+            // Create the QR code content - URL to access the QR code details
+            String qrContent = "http://ec2-13-49-68-126.eu-north-1.compute.amazonaws.com/qr/" + qrCodeId;
+            
+            // Generate QR code image
+            byte[] qrCodeImage = generateQRCodeImage(qrContent, 300, 300);
+            
+            // Convert to base64 data URL
+            String base64Image = Base64.getEncoder().encodeToString(qrCodeImage);
+            return "data:image/png;base64," + base64Image;
+            
+        } catch (Exception e) {
+            // Fallback to placeholder if QR generation fails
+            return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+        }
     }
     
-    private byte[] generateMockQRCodeImage(String qrCodeId) {
-        // Mock image - in real implementation, use ZXing library
-        return new byte[]{-119, 80, 78, 71, 13, 10, 26, 10}; // PNG header
+    private byte[] generateQRCodeImage(String content, int width, int height) throws WriterException, Exception {
+        // Set up QR code generation parameters
+        Map<EncodeHintType, Object> hints = new HashMap<>();
+        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+        hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+        hints.put(EncodeHintType.MARGIN, 1);
+        
+        // Generate QR code matrix
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height, hints);
+        
+        // Convert to image
+        BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
+        
+        // Convert to byte array
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage, "PNG", outputStream);
+        return outputStream.toByteArray();
     }
     
     private static void createMockQRCode(String id, String type, String name, String org) {

@@ -143,10 +143,39 @@
             
             <div class="p-6">
               <div class="text-center mb-6">
-                <div class="bg-gray-100 rounded-lg p-8 mb-4">
-                  <QrCodeIcon class="w-24 h-24 text-gray-400 mx-auto mb-4" />
-                  <p class="text-gray-600">Camera scanner would be here</p>
-                  <p class="text-sm text-gray-500">Scan QR codes for access verification</p>
+                <div class="bg-gray-100 rounded-lg p-4 mb-4">
+                  <!-- Camera Scanner -->
+                  <div v-if="cameraEnabled" class="relative">
+                    <video
+                      ref="videoElement"
+                      class="w-full max-w-sm mx-auto rounded-lg"
+                      autoplay
+                      muted
+                      playsinline
+                    ></video>
+                    <div class="absolute inset-0 pointer-events-none">
+                      <div class="border-2 border-green-500 rounded-lg m-8 opacity-50"></div>
+                    </div>
+                    <button
+                      @click="stopCamera"
+                      class="mt-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      Stop Camera
+                    </button>
+                  </div>
+                  
+                  <!-- Camera Placeholder -->
+                  <div v-else class="py-4">
+                    <QrCodeIcon class="w-24 h-24 text-gray-400 mx-auto mb-4" />
+                    <p class="text-gray-600 mb-2">Ready to scan QR codes</p>
+                    <button
+                      @click="startCamera"
+                      class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      📷 Start Camera Scanner
+                    </button>
+                    <p class="text-xs text-gray-500 mt-2">Allow camera access when prompted</p>
+                  </div>
                 </div>
                 
                 <!-- Manual QR Input -->
@@ -279,6 +308,8 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import QrScanner from 'qr-scanner'
+import apiService from '../services/api.js'
 import {
   ShieldCheckIcon,
   UserIcon,
@@ -310,6 +341,11 @@ let timeInterval = null
 const manualQrCode = ref(route.query.qr || '')
 const personDetails = ref(null)
 const accessNotes = ref('')
+
+// Camera scanning
+const cameraEnabled = ref(false)
+const videoElement = ref(null)
+const qrScanner = ref(null)
 
 // Modal and override
 const showOverrideModal = ref(false)
@@ -527,6 +563,62 @@ const logout = () => {
   router.push('/')
 }
 
+// Camera and QR Scanner methods
+const startCamera = async () => {
+  try {
+    cameraEnabled.value = true
+    
+    // Wait for video element to be available
+    await new Promise(resolve => setTimeout(resolve, 100))
+    
+    if (videoElement.value) {
+      qrScanner.value = new QrScanner(
+        videoElement.value,
+        (result) => {
+          // QR code detected
+          const qrData = result.data
+          console.log('QR Code detected:', qrData)
+          
+          // Extract QR code ID from URL
+          const qrMatch = qrData.match(/\/qr\/([A-Z0-9]+)/)
+          if (qrMatch) {
+            manualQrCode.value = qrMatch[1]
+            loadQrCode()
+          } else {
+            // Direct QR code ID
+            manualQrCode.value = qrData
+            loadQrCode()
+          }
+          
+          // Stop camera after successful scan
+          stopCamera()
+        },
+        {
+          returnDetailedScanResult: true,
+          highlightScanRegion: true,
+          highlightCodeOutline: true
+        }
+      )
+      
+      await qrScanner.value.start()
+      showMessage('Camera started - point at QR code to scan', 'success')
+    }
+  } catch (error) {
+    showMessage('Camera access denied or not available: ' + error.message, 'error')
+    cameraEnabled.value = false
+  }
+}
+
+const stopCamera = () => {
+  if (qrScanner.value) {
+    qrScanner.value.stop()
+    qrScanner.value.destroy()
+    qrScanner.value = null
+  }
+  cameraEnabled.value = false
+  showMessage('Camera stopped', 'success')
+}
+
 // Lifecycle
 onMounted(() => {
   // Check staff authentication
@@ -553,6 +645,12 @@ onMounted(() => {
 onUnmounted(() => {
   if (timeInterval) {
     clearInterval(timeInterval)
+  }
+  
+  // Clean up camera resources
+  if (qrScanner.value) {
+    qrScanner.value.stop()
+    qrScanner.value.destroy()
   }
 })
 </script>

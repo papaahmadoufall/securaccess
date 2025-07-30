@@ -14,6 +14,7 @@ import HostDashboard from './views/HostDashboard.vue'
 import QRAccess from './pages/QRAccess.vue'
 import StaffLogin from './pages/StaffLogin.vue'
 import StaffScanner from './pages/StaffScanner.vue'
+import QRCodeDisplay from './pages/QRCodeDisplay.vue'
 
 // Route guard to check authentication
 const requireAuth = (to, from, next) => {
@@ -92,6 +93,11 @@ const routes = [
     path: '/qr/:id',
     component: QRAccess,
     name: 'QRAccess'
+  },
+  {
+    path: '/qr-display',
+    component: QRCodeDisplay,
+    name: 'QRCodeDisplay'
   },
   // Staff routes
   {

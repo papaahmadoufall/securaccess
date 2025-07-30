@@ -20,7 +20,25 @@
       "Bash(mv:*)",
       "Bash(ssh:*)",
       "Bash(chmod:*)",
-      "Bash(scp:*)"
+      "Bash(scp:*)",
+      "Bash(git remote add:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git fetch:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh workflow list:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "WebFetch(domain:ec2-13-49-68-126.eu-north-1.compute.amazonaws.com)"
     ],
     "deny": []
   }
