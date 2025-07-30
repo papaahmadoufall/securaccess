@@ -157,4 +157,4 @@ Le projet utilise une architecture séparée avec un backend Java EE servant une
 
 ## Licence
 
-Ce projet est développé pour un usage entreprise.
+Ce projet est développé pour un usage entreprise.Testing GitHub Actions deployment...
