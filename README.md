@@ -1,26 +1,79 @@
-# SecurAccess Enterprise
+# 🔐 SecurAccess Enterprise
 
-Application de Gestion des Accès Temporaires et Suivi Entrées/Sorties
+[![Deploy to AWS EC2](https://github.com/YOUR_USERNAME/securaccess-enterprise/actions/workflows/deploy.yml/badge.svg)](https://github.com/YOUR_USERNAME/securaccess-enterprise/actions/workflows/deploy.yml)
+[![Test Suite](https://github.com/YOUR_USERNAME/securaccess-enterprise/actions/workflows/test.yml/badge.svg)](https://github.com/YOUR_USERNAME/securaccess-enterprise/actions/workflows/test.yml)
 
-## Description
+A comprehensive access management system built with Spring Boot and Vue.js for enterprise security and access control.
 
-SecurAccess Enterprise est une application web et mobile permettant de gérer les accès temporaires via QR codes pour des événements ponctuels (réunions, journées portes ouvertes, prestataires) et de suivre les entrées/sorties quotidiennes du personnel et des visiteurs.
+## 🌐 Live Application
 
-## Stack Technique
+- **Frontend**: http://ec2-13-49-68-126.eu-north-1.compute.amazonaws.com
+- **API**: http://ec2-13-49-68-126.eu-north-1.compute.amazonaws.com/api
+- **H2 Console**: http://ec2-13-49-68-126.eu-north-1.compute.amazonaws.com/api/h2-console
 
-### Backend
-- **Java EE (Jakarta EE)** - API RESTful avec JAX-RS
-- **JPA/Hibernate** - Persistance des données
-- **MySQL** - Base de données (port 3308)
-- **JWT** - Authentification et autorisation
-- **ZXing** - Génération et validation des QR codes
-- **Maven** - Gestion des dépendances
+## 🚀 Features
 
-### Frontend
-- **Nuxt.js (Vue 3)** - Framework frontend
-- **Tailwind CSS** - Framework CSS utilitaire
-- **Shadcn UI** - Composants UI accessibles
-- **Axios** - Client HTTP pour les API
+### 👥 User Management
+- **Multi-role authentication** (Worker, Host, Manager)
+- **CRUD operations** for all user types
+- **Department-based organization**
+- **Active/inactive status management**
+
+### 🔑 Access Control
+- **QR code generation** for secure access
+- **Access logging and history**
+- **Real-time access tracking**
+- **Zone-based access control**
+
+### 📊 Analytics & Reporting
+- **Dashboard with statistics**
+- **Access history reports**
+- **Department analytics**
+- **Event management and tracking**
+
+### 🛡️ Security
+- **JWT token authentication**
+- **Role-based access control**
+- **CORS configuration**
+- **Input validation and sanitization**
+
+## 🏗️ Architecture
+
+### Backend (Spring Boot 3.2.1)
+- **Spring Security** for authentication and authorization
+- **Spring Data JPA** with Hibernate ORM
+- **H2 Database** for development (easily configurable for PostgreSQL/MySQL)
+- **REST API** with comprehensive endpoints
+- **ZXing** for QR code generation
+- **Maven** for dependency management
+
+### Frontend (Vue.js 3)
+- **Vue 3** with Composition API
+- **Vite** for fast development and building
+- **Tailwind CSS** for styling
+- **Vue Router** for navigation
+- **Heroicons** for UI icons
+
+### Infrastructure
+- **AWS EC2** deployment
+- **Nginx** reverse proxy
+- **GitHub Actions** CI/CD
+- **Automated testing and deployment**
+
+## 🛠️ Technology Stack
+
+| Component | Technology | Version |
+|-----------|------------|---------|
+| Backend Framework | Spring Boot | 3.2.1 |
+| Frontend Framework | Vue.js | 3.4.21 |
+| Database | H2 (dev) / PostgreSQL (prod) | Latest |
+| Build Tool (Backend) | Maven | 3.9.6 |
+| Build Tool (Frontend) | Vite | 4.5.14 |
+| Java Version | Amazon Corretto | 17 |
+| Node.js | Node.js | 18.20.8 |
+| Styling | Tailwind CSS | 3.4.3 |
+| Web Server | Nginx | 1.28.0 |
+| Cloud Platform | AWS EC2 | Free Tier |
 
 ## Fonctionnalités Principales
 

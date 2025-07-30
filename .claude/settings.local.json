@@ -9,7 +9,18 @@
       "Bash(npm run dev:*)",
       "Bash(mvn clean:*)",
       "Bash(docker:*)",
-      "Bash(docker-compose:*)"
+      "Bash(docker-compose:*)",
+      "Bash(taskkill:*)",
+      "Bash(npx vite:*)",
+      "Bash(curl:*)",
+      "Bash(node:*)",
+      "Bash(pkill:*)",
+      "Bash(mysql:*)",
+      "Bash(wmic process where processid=44268 delete:*)",
+      "Bash(mv:*)",
+      "Bash(ssh:*)",
+      "Bash(chmod:*)",
+      "Bash(scp:*)"
     ],
     "deny": []
   }

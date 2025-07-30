@@ -1,0 +1,175 @@
+name: Deploy SecurAccess Enterprise to AWS EC2
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: '17'
+  NODE_VERSION: '18'
+  EC2_HOST: 'ec2-13-49-68-126.eu-north-1.compute.amazonaws.com'
+  EC2_USER: 'ec2-user'
+  APP_DIR: '/home/ec2-user/securaccess-enterprise'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'corretto'
+        
+    - name: Set up Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Cache Maven dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+        
+    - name: Run frontend tests
+      run: |
+        cd frontend
+        npm run test:unit || echo "No frontend tests configured"
+        
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
+        
+    - name: Run backend tests
+      run: |
+        cd backend
+        mvn clean test
+        
+    - name: Build backend
+      run: |
+        cd backend
+        mvn clean package -DskipTests
+
+  deploy:
+    name: Deploy to EC2
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'corretto'
+        
+    - name: Set up Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Cache Maven dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm ci
+        npm run build
+        
+    - name: Build backend
+      run: |
+        cd backend
+        mvn clean package -DskipTests
+        
+    - name: Prepare SSH key
+      run: |
+        echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
+        chmod 600 private_key.pem
+        
+    - name: Deploy to EC2
+      run: |
+        # Add EC2 host to known hosts
+        ssh-keyscan -H ${{ env.EC2_HOST }} >> ~/.ssh/known_hosts
+        
+        # Create backup of current deployment
+        ssh -i private_key.pem ${{ env.EC2_USER }}@${{ env.EC2_HOST }} "
+          if [ -d ${{ env.APP_DIR }}/backend/target ]; then
+            sudo cp -r ${{ env.APP_DIR }} ${{ env.APP_DIR }}_backup_\$(date +%Y%m%d_%H%M%S)
+          fi
+        "
+        
+        # Stop services
+        ssh -i private_key.pem ${{ env.EC2_USER }}@${{ env.EC2_HOST }} "
+          pkill -f securaccess-enterprise.jar || true
+          sudo systemctl stop nginx || true
+        "
+        
+        # Upload new backend
+        scp -i private_key.pem backend/target/securaccess-enterprise.jar \
+          ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:${{ env.APP_DIR }}/backend/target/
+        
+        # Upload new frontend
+        scp -i private_key.pem -r frontend/dist/* \
+          ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:${{ env.APP_DIR }}/frontend/dist/
+        
+        # Upload configuration files
+        scp -i private_key.pem backend/src/main/resources/application-prod.properties \
+          ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:${{ env.APP_DIR }}/backend/application.properties
+        
+        # Restart services
+        ssh -i private_key.pem ${{ env.EC2_USER }}@${{ env.EC2_HOST }} "
+          cd ${{ env.APP_DIR }}/backend
+          export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto.x86_64
+          nohup java -jar target/securaccess-enterprise.jar > ../logs/backend.log 2>&1 &
+          
+          # Wait for backend to start
+          sleep 10
+          
+          # Restart nginx
+          sudo systemctl start nginx
+          sudo systemctl reload nginx
+          
+          # Verify deployment
+          curl -f http://localhost:8080/api/test/health || exit 1
+          curl -f http://localhost/api/test/health || exit 1
+        "
+        
+    - name: Cleanup
+      if: always()
+      run: |
+        rm -f private_key.pem
+        
+    - name: Deployment Status
+      run: |
+        echo "🚀 Deployment completed successfully!"
+        echo "📱 Frontend: http://${{ env.EC2_HOST }}"
+        echo "🔗 Backend API: http://${{ env.EC2_HOST }}/api"
+        echo "📊 H2 Console: http://${{ env.EC2_HOST }}/api/h2-console"

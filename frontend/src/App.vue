@@ -1,16 +1,6 @@
 <template>
   <div id="app">
-    <nav class="navbar">
-      <div class="nav-container">
-        <h1 class="nav-title">
-          🔐 SecurAccess Enterprise
-        </h1>
-      </div>
-    </nav>
-    
-    <main class="main-content">
-      <router-view />
-    </main>
+    <router-view />
   </div>
 </template>
 
@@ -27,35 +17,75 @@ export default {
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f8fafc;
-  line-height: 1.6;
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f7fafc;
 }
 
-.navbar {
-  background: white;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid #e5e7eb;
+#app {
+  height: 100%;
 }
 
-.nav-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-  height: 4rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* Mobile-first responsive design */
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
 }
 
-.nav-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #1f2937;
+/* PWA and mobile optimizations */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
-.main-content {
-  min-height: calc(100vh - 4rem);
+input, textarea, select {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Scrollbar styling for webkit browsers */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Focus styles for accessibility */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #4299e1;
+  outline-offset: 2px;
+}
+
+/* Hide focus ring for mouse users */
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible) {
+  outline: none;
 }
 </style>

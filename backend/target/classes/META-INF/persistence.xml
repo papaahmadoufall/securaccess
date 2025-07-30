@@ -13,14 +13,18 @@
         <class>com.securaccess.enterprise.entities.Utilisateur</class>
         <class>com.securaccess.enterprise.entities.Evenement</class>
         <class>com.securaccess.enterprise.entities.ZoneAcces</class>
-        <class>com.securaccess.enterprise.entities.AccesEvenementZone</class>
         <class>com.securaccess.enterprise.entities.QrCode</class>
-        <class>com.securaccess.enterprise.entities.JournalAcces</class>
+        <class>com.securaccess.enterprise.entities.Worker</class>
+        <class>com.securaccess.enterprise.entities.Host</class>
+        <class>com.securaccess.enterprise.entities.Manager</class>
+        <class>com.securaccess.enterprise.entities.AccessLog</class>
+        <class>com.securaccess.enterprise.entities.WorkerQrCode</class>
+        <class>com.securaccess.enterprise.entities.HostQrCode</class>
         
         <properties>
             <!-- Database connection properties -->
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3308/securaccess_db?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3309/securaccess_db?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC"/>
             <property name="jakarta.persistence.jdbc.user" value="root"/>
             <property name="jakarta.persistence.jdbc.password" value=""/>
             

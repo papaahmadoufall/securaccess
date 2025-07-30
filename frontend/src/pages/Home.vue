@@ -12,7 +12,7 @@
         <p class="card-description">
           Créez et gérez vos événements, invitez des participants et définissez les zones d'accès.
         </p>
-        <button class="btn btn-blue">Gérer les événements</button>
+        <router-link to="/events" class="btn btn-blue">Gérer les événements</router-link>
       </div>
 
       <!-- Scanner QR Code -->
@@ -22,7 +22,7 @@
         <p class="card-description">
           Scannez les QR codes pour valider les accès et enregistrer les entrées/sorties.
         </p>
-        <button class="btn btn-green">Ouvrir le scanner</button>
+        <router-link to="/scanner" class="btn btn-green">Ouvrir le scanner</router-link>
       </div>
 
       <!-- Rapports et Statistiques -->
@@ -32,7 +32,7 @@
         <p class="card-description">
           Consultez les rapports de fréquentation et les statistiques d'accès en temps réel.
         </p>
-        <button class="btn btn-purple">Voir les rapports</button>
+        <router-link to="/reports" class="btn btn-purple">Voir les rapports</router-link>
       </div>
     </div>
   </div>
@@ -125,6 +125,8 @@ export default {
   cursor: pointer;
   transition: background-color 0.2s ease;
   color: white;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .btn-blue {

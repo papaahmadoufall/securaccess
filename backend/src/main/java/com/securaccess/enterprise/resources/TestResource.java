@@ -1,37 +1,34 @@
 package com.securaccess.enterprise.resources;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
-@Path("/test")
+@RestController
+@RequestMapping("/test")
+@CrossOrigin(origins = "*")
 public class TestResource {
     
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response test() {
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> test() {
         Map<String, Object> response = new HashMap<>();
         response.put("status", "success");
         response.put("message", "SecurAccess Enterprise Backend is working!");
         response.put("timestamp", System.currentTimeMillis());
         response.put("version", "1.0.0");
         
-        return Response.ok(response).build();
+        return ResponseEntity.ok(response);
     }
     
-    @GET
-    @Path("/health")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response health() {
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, Object>> health() {
         Map<String, Object> health = new HashMap<>();
         health.put("status", "UP");
         health.put("database", "Connected");
         health.put("service", "SecurAccess Enterprise");
         
-        return Response.ok(health).build();
+        return ResponseEntity.ok(health);
     }
 }
