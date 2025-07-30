@@ -109,11 +109,13 @@ jobs:
         cd backend
         mvn clean package -DskipTests
         
-    - name: Prepare SSH key
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.EC2_PRIVATE_KEY }}
+        
+    - name: Add EC2 to known hosts
       run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H ${{ env.EC2_HOST }} >> ~/.ssh/known_hosts
         
     - name: Deploy to EC2
@@ -167,7 +169,7 @@ jobs:
     - name: Cleanup
       if: always()
       run: |
-        rm -f ~/.ssh/id_rsa
+        echo "SSH agent will clean up automatically"
         
     - name: Deployment Status
       run: |
