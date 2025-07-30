@@ -40,7 +40,8 @@
       "Bash(grep:*)",
       "WebFetch(domain:ec2-13-49-68-126.eu-north-1.compute.amazonaws.com)",
       "Bash(./manual-deploy.sh)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   }

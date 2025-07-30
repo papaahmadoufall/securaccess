@@ -170,18 +170,42 @@
                     <p class="text-gray-600 mb-2">Ready to scan QR codes</p>
                     <button
                       @click="startCamera"
-                      class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors mb-3"
                     >
                       📷 Start Camera Scanner
                     </button>
-                    <p class="text-xs text-gray-500 mt-2">Allow camera access when prompted</p>
+                    
+                    <!-- Camera Help -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+                      <h4 class="font-semibold text-blue-900 mb-2">📱 Camera Access Guide</h4>
+                      <ul class="text-xs text-blue-800 space-y-1">
+                        <li>• Click "Allow" when browser asks for camera permission</li>
+                        <li>• If blocked: Click 🔒 lock icon → Set Camera to "Allow"</li>
+                        <li>• For mobile: Use back camera for better QR scanning</li>
+                        <li>• HTTPS required for camera access</li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
                 
-                <!-- Manual QR Input -->
+                <!-- Alternative QR Input Methods -->
                 <div class="space-y-4">
+                  <!-- File Upload Scanner -->
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Manual QR Code Entry</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">📸 Upload QR Code Image</label>
+                    <input
+                      ref="fileInput"
+                      type="file"
+                      accept="image/*"
+                      @change="handleFileUpload"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                    <p class="text-xs text-gray-500 mt-1">Alternative if camera doesn't work</p>
+                  </div>
+                  
+                  <!-- Manual QR Input -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">⌨️ Manual QR Code Entry</label>
                     <input
                       v-model="manualQrCode"
                       type="text"
@@ -346,6 +370,7 @@ const accessNotes = ref('')
 const cameraEnabled = ref(false)
 const videoElement = ref(null)
 const qrScanner = ref(null)
+const fileInput = ref(null)
 
 // Modal and override
 const showOverrideModal = ref(false)
@@ -566,46 +591,85 @@ const logout = () => {
 // Camera and QR Scanner methods
 const startCamera = async () => {
   try {
+    // Check if we're on HTTPS or localhost
+    const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+    
+    if (!isSecure) {
+      showMessage('Camera requires HTTPS connection. Use localhost or HTTPS for camera access.', 'error')
+      return
+    }
+    
+    // Check if camera is available
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showMessage('Camera API not supported in this browser', 'error')
+      return
+    }
+    
     cameraEnabled.value = true
     
     // Wait for video element to be available
     await new Promise(resolve => setTimeout(resolve, 100))
     
     if (videoElement.value) {
-      qrScanner.value = new QrScanner(
-        videoElement.value,
-        (result) => {
-          // QR code detected
-          const qrData = result.data
-          console.log('QR Code detected:', qrData)
-          
-          // Extract QR code ID from URL
-          const qrMatch = qrData.match(/\/qr\/([A-Z0-9]+)/)
-          if (qrMatch) {
-            manualQrCode.value = qrMatch[1]
-            loadQrCode()
-          } else {
-            // Direct QR code ID
-            manualQrCode.value = qrData
-            loadQrCode()
+      // Request camera permission explicitly first
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { 
+            facingMode: 'environment', // Use back camera if available
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          } 
+        })
+        
+        // Stop the test stream
+        stream.getTracks().forEach(track => track.stop())
+        
+        // Now start QR scanner
+        qrScanner.value = new QrScanner(
+          videoElement.value,
+          (result) => {
+            // QR code detected
+            const qrData = result.data
+            console.log('QR Code detected:', qrData)
+            
+            // Extract QR code ID from URL
+            const qrMatch = qrData.match(/\/qr\/([A-Z0-9]+)/)
+            if (qrMatch) {
+              manualQrCode.value = qrMatch[1]
+              loadQrCode()
+            } else {
+              // Direct QR code ID
+              manualQrCode.value = qrData
+              loadQrCode()
+            }
+            
+            // Stop camera after successful scan
+            stopCamera()
+          },
+          {
+            returnDetailedScanResult: true,
+            highlightScanRegion: true,
+            highlightCodeOutline: true,
+            preferredCamera: 'environment' // Prefer back camera
           }
-          
-          // Stop camera after successful scan
-          stopCamera()
-        },
-        {
-          returnDetailedScanResult: true,
-          highlightScanRegion: true,
-          highlightCodeOutline: true
-        }
-      )
-      
-      await qrScanner.value.start()
-      showMessage('Camera started - point at QR code to scan', 'success')
+        )
+        
+        await qrScanner.value.start()
+        showMessage('Camera started - point at QR code to scan', 'success')
+        
+      } catch (permissionError) {
+        throw new Error(`Camera permission denied. Please allow camera access and try again. Error: ${permissionError.message}`)
+      }
     }
   } catch (error) {
-    showMessage('Camera access denied or not available: ' + error.message, 'error')
+    console.error('Camera error:', error)
+    showMessage(`Camera access failed: ${error.message}`, 'error')
     cameraEnabled.value = false
+    
+    // Show additional help
+    setTimeout(() => {
+      showMessage('💡 Try: 1) Allow camera in browser settings 2) Use HTTPS 3) Check camera is not used by other apps', 'error')
+    }, 3000)
   }
 }
 
@@ -617,6 +681,44 @@ const stopCamera = () => {
   }
   cameraEnabled.value = false
   showMessage('Camera stopped', 'success')
+}
+
+// File upload QR scanner
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+  
+  try {
+    showMessage('Processing QR code image...', 'success')
+    
+    // Use QrScanner to scan from file
+    const result = await QrScanner.scanImage(file, {
+      returnDetailedScanResult: true
+    })
+    
+    const qrData = result.data
+    console.log('QR Code detected from file:', qrData)
+    
+    // Extract QR code ID from URL
+    const qrMatch = qrData.match(/\/qr\/([A-Z0-9]+)/)
+    if (qrMatch) {
+      manualQrCode.value = qrMatch[1]
+      loadQrCode()
+      showMessage(`QR Code found: ${qrMatch[1]}`, 'success')
+    } else {
+      // Direct QR code ID
+      manualQrCode.value = qrData
+      loadQrCode()
+      showMessage(`QR Code processed: ${qrData}`, 'success')
+    }
+    
+    // Clear file input
+    event.target.value = ''
+    
+  } catch (error) {
+    showMessage(`Failed to read QR code from image: ${error.message}`, 'error')
+    console.error('File QR scan error:', error)
+  }
 }
 
 // Lifecycle
