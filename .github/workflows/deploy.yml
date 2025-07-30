@@ -11,8 +11,8 @@ env:
   JAVA_VERSION: '17'
   NODE_VERSION: '18'
   EC2_HOST: 'ec2-13-49-68-126.eu-north-1.compute.amazonaws.com'
-  EC2_USER: 'ubuntu'
-  APP_DIR: '/home/ubuntu/securaccess-enterprise'
+  EC2_USER: 'ec2-user'
+  APP_DIR: '/home/ec2-user/securaccess-enterprise'
 
 jobs:
   test:

@@ -38,7 +38,9 @@
       "Bash(find:*)",
       "Bash(ls:*)",
       "Bash(grep:*)",
-      "WebFetch(domain:ec2-13-49-68-126.eu-north-1.compute.amazonaws.com)"
+      "WebFetch(domain:ec2-13-49-68-126.eu-north-1.compute.amazonaws.com)",
+      "Bash(./manual-deploy.sh)",
+      "Bash(gh api:*)"
     ],
     "deny": []
   }
