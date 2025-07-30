@@ -11,8 +11,8 @@ env:
   JAVA_VERSION: '17'
   NODE_VERSION: '18'
   EC2_HOST: 'ec2-13-49-68-126.eu-north-1.compute.amazonaws.com'
-  EC2_USER: 'ec2-user'
-  APP_DIR: '/home/ec2-user/securaccess-enterprise'
+  EC2_USER: 'ubuntu'
+  APP_DIR: '/home/ubuntu/securaccess-enterprise'
 
 jobs:
   test:
@@ -111,41 +111,43 @@ jobs:
         
     - name: Prepare SSH key
       run: |
-        echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
-        chmod 600 private_key.pem
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ env.EC2_HOST }} >> ~/.ssh/known_hosts
         
     - name: Deploy to EC2
       run: |
-        # Add EC2 host to known hosts
-        ssh-keyscan -H ${{ env.EC2_HOST }} >> ~/.ssh/known_hosts
+        # Test SSH connectivity first
+        ssh -o ConnectTimeout=10 ${{ env.EC2_USER }}@${{ env.EC2_HOST }} "echo 'SSH connection successful'"
         
         # Create backup of current deployment
-        ssh -i private_key.pem ${{ env.EC2_USER }}@${{ env.EC2_HOST }} "
+        ssh ${{ env.EC2_USER }}@${{ env.EC2_HOST }} "
           if [ -d ${{ env.APP_DIR }}/backend/target ]; then
             sudo cp -r ${{ env.APP_DIR }} ${{ env.APP_DIR }}_backup_\$(date +%Y%m%d_%H%M%S)
           fi
         "
         
         # Stop services
-        ssh -i private_key.pem ${{ env.EC2_USER }}@${{ env.EC2_HOST }} "
+        ssh ${{ env.EC2_USER }}@${{ env.EC2_HOST }} "
           pkill -f securaccess-enterprise.jar || true
           sudo systemctl stop nginx || true
         "
         
         # Upload new backend
-        scp -i private_key.pem backend/target/securaccess-enterprise.jar \
+        scp backend/target/securaccess-enterprise.jar \
           ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:${{ env.APP_DIR }}/backend/target/
         
         # Upload new frontend
-        scp -i private_key.pem -r frontend/dist/* \
+        scp -r frontend/dist/* \
           ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:${{ env.APP_DIR }}/frontend/dist/
         
         # Upload configuration files
-        scp -i private_key.pem backend/src/main/resources/application-prod.properties \
+        scp backend/src/main/resources/application-prod.properties \
           ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:${{ env.APP_DIR }}/backend/application.properties
         
         # Restart services
-        ssh -i private_key.pem ${{ env.EC2_USER }}@${{ env.EC2_HOST }} "
+        ssh ${{ env.EC2_USER }}@${{ env.EC2_HOST }} "
           cd ${{ env.APP_DIR }}/backend
           export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto.x86_64
           nohup java -jar target/securaccess-enterprise.jar > ../logs/backend.log 2>&1 &
@@ -165,7 +167,7 @@ jobs:
     - name: Cleanup
       if: always()
       run: |
-        rm -f private_key.pem
+        rm -f ~/.ssh/id_rsa
         
     - name: Deployment Status
       run: |
