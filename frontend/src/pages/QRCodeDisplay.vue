@@ -15,7 +15,7 @@
         <div class="bg-white rounded-xl shadow-lg p-6 text-center">
           <div class="mb-4">
             <h3 class="text-lg font-semibold text-gray-900">Jean Dupont</h3>
-            <p class="text-sm text-gray-600">IT Department</p>
+            <p class="text-sm text-gray-600">Département IT</p>
             <p class="text-xs text-gray-500">QR001</p>
           </div>
           

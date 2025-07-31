@@ -168,7 +168,7 @@
               v-model="workerForm.phone" 
               type="tel" 
               class="form-input"
-              placeholder="06 12 34 56 78"
+              placeholder="77 123 45 67"
               @input="formatWorkerPhone"
               required
             >
@@ -233,7 +233,7 @@
               v-model="hostForm.phone" 
               type="tel" 
               class="form-input"
-              placeholder="06 98 76 54 32"
+              placeholder="78 987 65 43"
               @input="formatHostPhone"
               required
             >
@@ -304,7 +304,7 @@
             <h4>Format requis:</h4>
             <code>nom,telephone,pin,departement</code>
             <p>Exemple:</p>
-            <code>Jean Dupont,0612345678,1234,IT</code>
+            <code>Jean Dupont,771234567,1234,IT</code>
           </div>
           
           <div class="file-upload">
@@ -362,6 +362,8 @@
 </template>
 
 <script>
+import { formatSenegalPhone, formatPhoneInput, formatSenegalDate } from '@/utils/senegalFormat.js'
+
 export default {
   name: 'ManagerDashboard',
   data() {
@@ -476,48 +478,19 @@ export default {
     },
     
     formatPhone(phone) {
-      const cleaned = phone.replace(/\D/g, '');
-      return cleaned.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
+      return formatSenegalPhone(phone);
     },
     
     formatDate(date) {
-      return new Date(date).toLocaleDateString('fr-FR');
+      return formatSenegalDate(date);
     },
     
     formatWorkerPhone() {
-      let phone = this.workerForm.phone.replace(/\D/g, '');
-      if (phone.length > 10) phone = phone.substring(0, 10);
-      
-      if (phone.length >= 2) {
-        phone = phone.replace(/(\d{2})(\d{2})?(\d{2})?(\d{2})?(\d{2})?/, 
-          (match, p1, p2, p3, p4, p5) => {
-            let formatted = p1;
-            if (p2) formatted += ' ' + p2;
-            if (p3) formatted += ' ' + p3;
-            if (p4) formatted += ' ' + p4;
-            if (p5) formatted += ' ' + p5;
-            return formatted;
-          });
-      }
-      this.workerForm.phone = phone;
+      this.workerForm.phone = formatPhoneInput(this.workerForm.phone);
     },
     
     formatHostPhone() {
-      let phone = this.hostForm.phone.replace(/\D/g, '');
-      if (phone.length > 10) phone = phone.substring(0, 10);
-      
-      if (phone.length >= 2) {
-        phone = phone.replace(/(\d{2})(\d{2})?(\d{2})?(\d{2})?(\d{2})?/, 
-          (match, p1, p2, p3, p4, p5) => {
-            let formatted = p1;
-            if (p2) formatted += ' ' + p2;
-            if (p3) formatted += ' ' + p3;
-            if (p4) formatted += ' ' + p4;
-            if (p5) formatted += ' ' + p5;
-            return formatted;
-          });
-      }
-      this.hostForm.phone = phone;
+      this.hostForm.phone = formatPhoneInput(this.hostForm.phone);
     },
     
     async saveWorker() {

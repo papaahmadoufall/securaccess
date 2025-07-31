@@ -171,7 +171,7 @@
             <hr>
             
             <p><strong>Sécurité de l'entreprise:</strong></p>
-            <p><a href="tel:+33123456789">01 23 45 67 89</a></p>
+            <p><a href="tel:+221771234567">77 123 45 67</a></p>
             
             <p><strong>Urgences:</strong></p>
             <p><a href="tel:15">15 (SAMU)</a> | <a href="tel:18">18 (Pompiers)</a></p>
@@ -211,6 +211,8 @@
 </template>
 
 <script>
+import { formatSenegalPhone, formatSenegalDate, formatSenegalDateTime } from '@/utils/senegalFormat.js'
+
 export default {
   name: 'HostDashboard',
   data() {
@@ -240,7 +242,7 @@ export default {
         instructions: 'Présentez votre QR code au scanner à l\'entrée. En cas de problème, contactez votre hôte ou la sécurité.',
         hostContact: {
           name: 'Marie Manager',
-          phone: '0123456789'
+          phone: '771234567'
         }
       },
       accessHistory: []
@@ -453,26 +455,15 @@ export default {
     },
     
     formatPhone(phone) {
-      const cleaned = phone.replace(/\D/g, '');
-      return cleaned.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
+      return formatSenegalPhone(phone);
     },
     
     formatDate(date) {
-      return new Date(date).toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      });
+      return formatSenegalDate(date);
     },
     
     formatDateTime(date) {
-      return new Date(date).toLocaleString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      return formatSenegalDateTime(date);
     },
     
     showEmergencyContact() {

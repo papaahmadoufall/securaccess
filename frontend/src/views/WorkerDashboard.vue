@@ -105,8 +105,8 @@
         </div>
         <div class="modal-content">
           <div class="emergency-contact">
-            <p><strong>Sécurité:</strong> <a href="tel:+33123456789">01 23 45 67 89</a></p>
-            <p><strong>Manager:</strong> <a href="tel:+33198765432">01 98 76 54 32</a></p>
+            <p><strong>Sécurité:</strong> <a href="tel:+221771234567">77 123 45 67</a></p>
+            <p><strong>Manager:</strong> <a href="tel:+221789876543">78 987 65 43</a></p>
             <p><strong>Urgences:</strong> <a href="tel:15">15</a></p>
           </div>
         </div>
@@ -143,6 +143,8 @@
 </template>
 
 <script>
+import { formatSenegalPhone, formatSenegalDateTime } from '@/utils/senegalFormat.js'
+
 export default {
   name: 'WorkerDashboard',
   data() {
@@ -338,20 +340,11 @@ export default {
     },
     
     formatPhone(phone) {
-      if (!phone) return '';
-      const cleaned = phone.replace(/\D/g, '');
-      if (cleaned.length !== 10) return phone;
-      return cleaned.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
+      return formatSenegalPhone(phone);
     },
     
     formatDateTime(date) {
-      return new Date(date).toLocaleString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      return formatSenegalDateTime(date);
     },
     
     showEmergencyContact() {

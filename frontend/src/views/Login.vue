@@ -17,7 +17,7 @@
             v-model="loginForm.phone" 
             type="tel" 
             class="form-input"
-            placeholder="06 12 34 56 78"
+            placeholder="77 123 45 67"
             maxlength="14"
             required
             @input="formatPhoneNumber"
@@ -115,6 +115,8 @@
 </template>
 
 <script>
+import { formatPhoneInput } from '@/utils/senegalFormat.js'
+
 export default {
   name: 'Login',
   data() {
@@ -136,34 +138,13 @@ export default {
   },
   computed: {
     isFormValid() {
-      return this.loginForm.phone.replace(/\s/g, '').length >= 10 && 
+      return this.loginForm.phone.replace(/\s/g, '').length >= 9 && 
              this.loginForm.pin.length === 4;
     }
   },
   methods: {
     formatPhoneNumber() {
-      // Remove all non-digits
-      let phone = this.loginForm.phone.replace(/\D/g, '');
-      
-      // Limit to 10 digits
-      if (phone.length > 10) {
-        phone = phone.substring(0, 10);
-      }
-      
-      // Format as 06 12 34 56 78
-      if (phone.length >= 2) {
-        phone = phone.replace(/(\d{2})(\d{2})?(\d{2})?(\d{2})?(\d{2})?/, 
-          (match, p1, p2, p3, p4, p5) => {
-            let formatted = p1;
-            if (p2) formatted += ' ' + p2;
-            if (p3) formatted += ' ' + p3;
-            if (p4) formatted += ' ' + p4;
-            if (p5) formatted += ' ' + p5;
-            return formatted;
-          });
-      }
-      
-      this.loginForm.phone = phone;
+      this.loginForm.phone = formatPhoneInput(this.loginForm.phone);
     },
     
     formatPin(event) {
