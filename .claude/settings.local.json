@@ -46,7 +46,8 @@
       "Bash(echo $NODE_ENV)",
       "Bash(npm run preview:*)",
       "Bash(netlify:*)",
-      "Bash(npx netlify:*)"
+      "Bash(npx netlify:*)",
+      "Bash(./mvnw compile:*)"
     ],
     "deny": []
   }

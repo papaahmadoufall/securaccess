@@ -17,8 +17,8 @@ public class AuthController {
             String phone = credentials.get("phone");
             String pin = credentials.get("pin");
             
-            // Mock authentication - check against hardcoded credentials
-            if ("0612345678".equals(phone) && "1234".equals(pin)) {
+            // Mock authentication - check against hardcoded credentials (Senegal format)
+            if ("771234567".equals(phone) && "1234".equals(pin)) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 response.put("token", "mock-worker-token-" + System.currentTimeMillis());
@@ -26,7 +26,7 @@ public class AuthController {
                 response.put("message", "Connexion réussie");
                 
                 return ResponseEntity.ok(response);
-            } else if ("0698765432".equals(phone) && "5678".equals(pin)) {
+            } else if ("789876543".equals(phone) && "1234".equals(pin)) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 response.put("token", "mock-worker-token-" + System.currentTimeMillis());
@@ -48,12 +48,20 @@ public class AuthController {
             String phone = credentials.get("phone");
             String pin = credentials.get("pin");
             
-            // Mock authentication for hosts
-            if ("0623456789".equals(phone) && "9999".equals(pin)) {
+            // Mock authentication for hosts (Senegal format)
+            if ("789876543".equals(phone) && "5678".equals(pin)) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 response.put("token", "mock-host-token-" + System.currentTimeMillis());
                 response.put("user", createMockHost("1", "Marie Martin", phone));
+                response.put("message", "Connexion réussie");
+                
+                return ResponseEntity.ok(response);
+            } else if ("771234567".equals(phone) && "5678".equals(pin)) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", true);
+                response.put("token", "mock-host-token-" + System.currentTimeMillis());
+                response.put("user", createMockHost("2", "Ahmed Fall", phone));
                 response.put("message", "Connexion réussie");
                 
                 return ResponseEntity.ok(response);

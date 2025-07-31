@@ -20,6 +20,7 @@ D:\examen_java\IO_handler\io_handler\backend\src\main\java\com\securaccess\enter
 D:\examen_java\IO_handler\io_handler\backend\src\main\java\com\securaccess\enterprise\repositories\ManagerRepository.java
 D:\examen_java\IO_handler\io_handler\backend\src\main\java\com\securaccess\enterprise\entities\Host.java
 D:\examen_java\IO_handler\io_handler\backend\src\main\java\com\securaccess\enterprise\entities\Worker.java
+D:\examen_java\IO_handler\io_handler\backend\src\main\java\com\securaccess\enterprise\controllers\ManagerController.java
 D:\examen_java\IO_handler\io_handler\backend\src\main\java\com\securaccess\enterprise\entities\QrCode.java
 D:\examen_java\IO_handler\io_handler\backend\src\main\java\com\securaccess\enterprise\resources\QrCodeResource.java
 D:\examen_java\IO_handler\io_handler\backend\src\main\java\com\securaccess\enterprise\repositories\EvenementRepository.java

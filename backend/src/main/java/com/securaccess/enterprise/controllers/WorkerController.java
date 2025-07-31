@@ -20,7 +20,7 @@ public class WorkerController {
         Map<String, Object> worker1 = new HashMap<>();
         worker1.put("id", "1");
         worker1.put("name", "Jean Dupont");
-        worker1.put("phone", "0612345678");
+        worker1.put("phone", "771234567");
         worker1.put("pinHash", "1234"); // In real app, this would be hashed
         worker1.put("department", "IT");
         worker1.put("isActive", true);
@@ -31,8 +31,8 @@ public class WorkerController {
         Map<String, Object> worker2 = new HashMap<>();
         worker2.put("id", "2");
         worker2.put("name", "Pierre Durand");
-        worker2.put("phone", "0698765432");
-        worker2.put("pinHash", "5678");
+        worker2.put("phone", "789876543");
+        worker2.put("pinHash", "1234");
         worker2.put("department", "Marketing");
         worker2.put("isActive", true);
         worker2.put("createdAt", "2024-01-20T14:15:00");

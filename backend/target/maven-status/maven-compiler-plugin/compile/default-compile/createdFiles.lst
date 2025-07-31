@@ -26,6 +26,7 @@ com\securaccess\enterprise\entities\Utilisateur.class
 com\securaccess\enterprise\repositories\WorkerRepository.class
 com\securaccess\enterprise\repositories\UtilisateurRepository.class
 com\securaccess\enterprise\entities\QrCode.class
+com\securaccess\enterprise\controllers\ManagerController.class
 com\securaccess\enterprise\services\UtilisateurService.class
 com\securaccess\enterprise\controllers\HostController.class
 com\securaccess\enterprise\repositories\AccessLogRepository.class

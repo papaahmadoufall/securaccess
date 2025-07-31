@@ -21,8 +21,8 @@ public class HostController {
         Map<String, Object> host1 = new HashMap<>();
         host1.put("id", "1");
         host1.put("name", "Marie Martin");
-        host1.put("phone", "0623456789");
-        host1.put("pinHash", "9999"); // In real app, this would be hashed
+        host1.put("phone", "789876543");
+        host1.put("pinHash", "5678"); // In real app, this would be hashed
         host1.put("accessLocation", "Salle de Conférence A");
         host1.put("accessStartDate", LocalDate.now().minusDays(1).toString());
         host1.put("accessEndDate", LocalDate.now().plusDays(7).toString());
