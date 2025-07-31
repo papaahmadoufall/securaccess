@@ -294,6 +294,39 @@ class ApiService {
         return await this.request('/staff/dashboard/stats');
     }
 
+    // Manager API methods
+    async getAllManagers() {
+        return await this.request('/managers');
+    }
+
+    async createManager(managerData) {
+        return await this.request('/managers', {
+            method: 'POST',
+            body: JSON.stringify(managerData),
+        });
+    }
+
+    async getManager(managerId) {
+        return await this.request(`/managers/${managerId}`);
+    }
+
+    async updateManager(managerId, managerData) {
+        return await this.request(`/managers/${managerId}`, {
+            method: 'PUT',
+            body: JSON.stringify(managerData),
+        });
+    }
+
+    async deleteManager(managerId) {
+        return await this.request(`/managers/${managerId}`, {
+            method: 'DELETE',
+        });
+    }
+
+    async getManagerProfile(managerId) {
+        return await this.request(`/managers/${managerId}/profile`);
+    }
+
     // Utility method to handle API errors
     handleApiError(error) {
         if (error.message.includes('401') || error.message.includes('Token')) {

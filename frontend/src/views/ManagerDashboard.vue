@@ -46,8 +46,11 @@
 
     <!-- Action Buttons -->
     <div class="action-buttons">
-      <button @click="showAddWorker = true" class="action-btn primary">
-        ➕ Ajouter Employé
+      <button @click="showAddUser = true" class="action-btn primary">
+        ➕ Ajouter Nouvel Utilisateur
+      </button>
+      <button @click="showAddWorker = true" class="action-btn secondary">
+        👥 Ajouter Employé
       </button>
       <button @click="showImportCSV = true" class="action-btn secondary">
         📋 Importer CSV
@@ -139,6 +142,84 @@
               {{ host.isActive ? '🔒' : '🔓' }}
             </button>
             <button @click="deleteHost(host)" class="btn-icon danger">🗑️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Managers List -->
+    <div v-if="managers.length > 0" class="section">
+      <div class="section-header">
+        <h3>👨‍💼 Gestion des Managers</h3>
+        <div class="section-stats">
+          <span class="stat-badge">{{ managers.length }} managers</span>
+        </div>
+      </div>
+      <div class="list-container">
+        <div v-for="manager in managers" :key="manager.id" class="list-item">
+          <div class="manager-info">
+            <div class="manager-name">{{ manager.name }}</div>
+            <div class="manager-email">{{ manager.email }}</div>
+            <div class="manager-department">{{ manager.department }}</div>
+          </div>
+          <div class="manager-status">
+            <span :class="['status-badge', { active: manager.isActive }]">
+              {{ manager.isActive ? 'Actif' : 'Inactif' }}
+            </span>
+          </div>
+          <div class="manager-actions">
+            <button @click="editManager(manager)" class="btn-icon">✏️</button>
+            <button @click="toggleManagerStatus(manager)" class="btn-icon">
+              {{ manager.isActive ? '🔒' : '🔓' }}
+            </button>
+            <button @click="deleteManager(manager)" class="btn-icon danger">🗑️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add New User Modal -->
+    <div v-if="showAddUser" class="modal-overlay" @click="closeAddUser">
+      <div class="modal-card" @click.stop>
+        <div class="modal-header">
+          <h3>➕ Ajouter Nouvel Utilisateur</h3>
+          <button @click="closeAddUser" class="close-btn">✖</button>
+        </div>
+        <div class="modal-content">
+          <div class="user-type-selection">
+            <h4>Choisissez le type d'utilisateur :</h4>
+            <div class="user-type-grid">
+              <div class="user-type-card" @click="selectUserType('worker')">
+                <div class="user-type-icon">👥</div>
+                <h5>Employé</h5>
+                <p>Accès aux zones de travail, génération de QR codes d'accès</p>
+                <ul>
+                  <li>Accès aux espaces de travail</li>
+                  <li>QR code personnel</li>
+                  <li>Suivi des accès</li>
+                </ul>
+              </div>
+              <div class="user-type-card" @click="selectUserType('host')">
+                <div class="user-type-icon">🏠</div>
+                <h5>Hôte</h5>
+                <p>Accès temporaire avec dates de validité spécifiques</p>
+                <ul>
+                  <li>Accès limité dans le temps</li>
+                  <li>QR code avec expiration</li>
+                  <li>Zones spécifiques</li>
+                </ul>
+              </div>
+              <div class="user-type-card" @click="selectUserType('manager')">
+                <div class="user-type-icon">👨‍💼</div>
+                <h5>Manager</h5>
+                <p>Gestion complète des utilisateurs et accès</p>
+                <ul>
+                  <li>Gestion des employés et hôtes</li>
+                  <li>Rapports et statistiques</li>
+                  <li>Configuration du système</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -292,6 +373,68 @@
       </div>
     </div>
 
+    <!-- Add Manager Modal -->
+    <div v-if="showAddManager" class="modal-overlay" @click="closeAddManager">
+      <div class="modal-card" @click.stop>
+        <div class="modal-header">
+          <h3>👨‍💼 Ajouter Manager</h3>
+          <button @click="closeAddManager" class="close-btn">✖</button>
+        </div>
+        <form @submit.prevent="saveManager" class="modal-form">
+          <div class="form-group">
+            <label>👤 Nom complet</label>
+            <input 
+              v-model="managerForm.name" 
+              type="text" 
+              class="form-input"
+              placeholder="Marie Martin"
+              required
+            >
+          </div>
+          <div class="form-group">
+            <label>📧 Email</label>
+            <input 
+              v-model="managerForm.email" 
+              type="email" 
+              class="form-input"
+              placeholder="marie.martin@company.com"
+              required
+            >
+          </div>
+          <div class="form-group">
+            <label>🔒 Mot de passe</label>
+            <input 
+              v-model="managerForm.password" 
+              type="password" 
+              class="form-input"
+              placeholder="••••••••"
+              minlength="6"
+              required
+            >
+          </div>
+          <div class="form-group">
+            <label>🏢 Département</label>
+            <select v-model="managerForm.department" class="form-input" required>
+              <option value="">Sélectionnez un département</option>
+              <option value="Administration">Administration</option>
+              <option value="Ressources Humaines">Ressources Humaines</option>
+              <option value="IT">IT</option>
+              <option value="Sécurité">Sécurité</option>
+              <option value="Opérations">Opérations</option>
+            </select>
+          </div>
+          <div class="modal-buttons">
+            <button type="button" @click="closeAddManager" class="btn-secondary">
+              Annuler
+            </button>
+            <button type="submit" class="btn-primary" :disabled="isLoading">
+              {{ isLoading ? 'Création...' : 'Créer Manager' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- CSV Import Modal -->
     <div v-if="showImportCSV" class="modal-overlay" @click="closeImportCSV">
       <div class="modal-card" @click.stop>
@@ -375,8 +518,10 @@ export default {
       },
       searchWorker: '',
       searchHost: '',
+      showAddUser: false,
       showAddWorker: false,
       showAddHost: false,
+      showAddManager: false,
       showImportCSV: false,
       editingWorker: null,
       editingHost: null,
@@ -402,8 +547,15 @@ export default {
         accessStart: '',
         accessEnd: ''
       },
+      managerForm: {
+        name: '',
+        email: '',
+        password: '',
+        department: ''
+      },
       workers: [],
-      hosts: []
+      hosts: [],
+      managers: []
     }
   },
   computed: {
@@ -471,6 +623,12 @@ export default {
             accessStart: new Date(host.accessStartDate),
             accessEnd: new Date(host.accessEndDate)
           }));
+        }
+        
+        // Load managers
+        const managersResponse = await this.$api.getAllManagers();
+        if (managersResponse.success) {
+          this.managers = managersResponse.managers;
         }
       } catch (error) {
         console.error('Error loading dashboard data:', error);
@@ -577,6 +735,76 @@ export default {
         alert('Erreur lors de la sauvegarde de l\'hôte');
       } finally {
         this.isLoading = false;
+      }
+    },
+    
+    async saveManager() {
+      this.isLoading = true;
+      try {
+        const managerData = {
+          name: this.managerForm.name,
+          email: this.managerForm.email,
+          password: this.managerForm.password,
+          department: this.managerForm.department
+        };
+        
+        const response = await this.$api.createManager(managerData);
+        if (response.success) {
+          this.managers.push({
+            ...response.manager,
+            createdAt: new Date().toISOString()
+          });
+          this.stats.totalManagers = (this.stats.totalManagers || 0) + 1;
+          alert(`Manager ${managerData.name} créé avec succès!`);
+        }
+        
+        this.closeAddManager();
+      } catch (error) {
+        console.error('Error saving manager:', error);
+        alert('Erreur lors de la création du manager');
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    
+    editManager(manager) {
+      this.managerForm = {
+        name: manager.name,
+        email: manager.email,
+        password: '', // Don't pre-fill password for security
+        department: manager.department
+      };
+      this.showAddManager = true;
+    },
+    
+    async toggleManagerStatus(manager) {
+      try {
+        const response = await this.$api.updateManager(manager.id, {
+          isActive: !manager.isActive
+        });
+        if (response.success) {
+          manager.isActive = !manager.isActive;
+        }
+      } catch (error) {
+        console.error('Error toggling manager status:', error);
+        alert('Erreur lors de la modification du statut');
+      }
+    },
+    
+    async deleteManager(manager) {
+      if (confirm(`Êtes-vous sûr de vouloir supprimer le manager ${manager.name} ?`)) {
+        try {
+          const response = await this.$api.deleteManager(manager.id);
+          if (response.success) {
+            const index = this.managers.findIndex(m => m.id === manager.id);
+            this.managers.splice(index, 1);
+            this.stats.totalManagers = Math.max(0, (this.stats.totalManagers || 0) - 1);
+            alert('Manager supprimé avec succès');
+          }
+        } catch (error) {
+          console.error('Error deleting manager:', error);
+          alert('Erreur lors de la suppression du manager');
+        }
       }
     },
     
@@ -734,6 +962,22 @@ export default {
       }
     },
     
+    closeAddUser() {
+      this.showAddUser = false;
+    },
+    
+    selectUserType(userType) {
+      this.closeAddUser();
+      
+      if (userType === 'worker') {
+        this.showAddWorker = true;
+      } else if (userType === 'host') {
+        this.showAddHost = true;
+      } else if (userType === 'manager') {
+        this.showAddManager = true;
+      }
+    },
+    
     closeAddWorker() {
       this.showAddWorker = false;
       this.editingWorker = null;
@@ -744,6 +988,11 @@ export default {
       this.showAddHost = false;
       this.editingHost = null;
       this.hostForm = { name: '', phone: '', pin: '', location: '', accessStart: '', accessEnd: '' };
+    },
+    
+    closeAddManager() {
+      this.showAddManager = false;
+      this.managerForm = { name: '', email: '', password: '', department: '' };
     },
     
     closeImportCSV() {
@@ -1053,9 +1302,37 @@ export default {
 }
 
 .worker-actions,
-.host-actions {
+.host-actions,
+.manager-actions {
   display: flex;
   gap: 0.5rem;
+}
+
+.manager-info {
+  flex: 1;
+}
+
+.manager-name {
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.25rem;
+}
+
+.manager-email {
+  color: #4a5568;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.manager-department {
+  color: #718096;
+  font-size: 0.8rem;
+}
+
+.manager-status {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
 }
 
 .btn-icon {
@@ -1329,6 +1606,100 @@ export default {
   .preview-row {
     grid-template-columns: 1fr;
     gap: 0.5rem;
+  }
+}
+
+/* User Type Selection Styles */
+.user-type-selection {
+  padding: 1rem;
+}
+
+.user-type-selection h4 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #2d3748;
+  font-size: 1.1rem;
+}
+
+.user-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.user-type-card {
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-type-card:hover {
+  border-color: #4299e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.15);
+}
+
+.user-type-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.user-type-card h5 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #2d3748;
+}
+
+.user-type-card p {
+  color: #4a5568;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.user-type-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+.user-type-card li {
+  color: #4a5568;
+  font-size: 0.85rem;
+  padding: 0.25rem 0;
+  position: relative;
+  padding-left: 1.2rem;
+}
+
+.user-type-card li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #48bb78;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .user-type-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .user-type-card {
+    padding: 1rem;
+  }
+  
+  .user-type-icon {
+    font-size: 2rem;
   }
 }
 </style>
