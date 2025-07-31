@@ -13,15 +13,16 @@
   },
   "dependencies": {
     "@heroicons/vue": "^2.0.18",
+    "qr-scanner": "^1.4.2",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0",
-    "qr-scanner": "^1.4.2"
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.6.2",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
+    "terser": "^5.43.1",
     "vite": "^4.5.14"
   },
   "engines": {

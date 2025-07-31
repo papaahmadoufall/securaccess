@@ -42,7 +42,11 @@
       "Bash(./manual-deploy.sh)",
       "Bash(gh api:*)",
       "Bash(npm run build:*)",
-      "Bash(./setup-self-signed-ssl.sh:*)"
+      "Bash(./setup-self-signed-ssl.sh:*)",
+      "Bash(echo $NODE_ENV)",
+      "Bash(npm run preview:*)",
+      "Bash(netlify:*)",
+      "Bash(npx netlify:*)"
     ],
     "deny": []
   }

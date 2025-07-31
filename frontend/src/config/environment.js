@@ -7,7 +7,7 @@ const environments = {
     DEBUG: true
   },
   production: {
-    API_BASE_URL: 'http://ec2-13-49-68-126.eu-north-1.compute.amazonaws.com/api',
+    API_BASE_URL: '/api',
     NODE_ENV: 'production', 
     DEBUG: false
   }
@@ -15,6 +15,8 @@ const environments = {
 
 // Determine current environment
 const currentEnv = process.env.NODE_ENV || 'development';
+console.log('Current environment:', currentEnv);
+console.log('API Base URL:', environments[currentEnv].API_BASE_URL);
 
 // Export current environment configuration
 export const config = environments[currentEnv];
